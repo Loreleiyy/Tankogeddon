@@ -3,6 +3,8 @@
 
 #include "Projectile.h"
 #include <Components/StaticMeshComponent.h>
+#include <Components/SphereComponent.h>
+#include "DamageTaker.h"
 
 
 // Sets default values
@@ -14,8 +16,14 @@ AProjectile::AProjectile()
 	USceneComponent* SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	RootComponent = SceneComp;
 
+	//SphereCollision = CreateDefaultSubobject< USphereComponent>(TEXT("BoxCollision"));
+	//SphereCollision->SetupAttachment(SceneComp);
+	//SphereCollision->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
+	//SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::OnMeshOverlapBegin);
+
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMesh"));
 	ProjectileMesh->SetupAttachment(SceneComp);
+	//ProjectileMesh->SetupAttachment(SphereCollision);
 	ProjectileMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
 	ProjectileMesh->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::OnMeshOverlapBegin);
 	
@@ -64,9 +72,25 @@ void AProjectile::Move()
 
 void AProjectile::OnMeshOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor) {
-		UE_LOG(LogTemp, Warning, TEXT("Overlapped actor: %s"), *OtherActor->GetName());
-		OtherActor->Destroy();
+
+	AActor* owner = GetOwner(); // ACAnnon
+	AActor* OwnewByOwner = owner != nullptr ? owner->GetOwner() : nullptr; // ATankPawn or ATurret
+
+
+	if (OtherActor != owner || OtherActor != OwnewByOwner) {
+		IDamageTaker* DamageActor = Cast<IDamageTaker>(OtherActor);
+		if (DamageActor) {
+			FDamageData DamageData;
+			DamageData.DamageValue = Damage;
+			DamageData.Instigator = owner;
+			DamageData.DamageMaker = this;
+
+			DamageActor->TakeDamage(DamageData);
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("Overlapped actor: %s"), *OtherActor->GetName());
+			OtherActor->Destroy();
+		}
 		Stop();
 	}
 }

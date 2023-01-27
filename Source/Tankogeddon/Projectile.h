@@ -8,6 +8,7 @@
 
 class UStaticMeshComponent;
 class UPrimitiveComponent;
+class USphereComponent;
 
 
 UCLASS()
@@ -32,6 +33,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 		UStaticMeshComponent* ProjectileMesh;
+
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+	//	USphereComponent* SphereCollision;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 		float MoveSpeed = 100.0f;

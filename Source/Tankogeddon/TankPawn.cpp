@@ -4,6 +4,7 @@
 #include "TankPawn.h"
 #include "Cannon.h"
 #include "TankPlayerController.h"
+#include "HealthComponent.h"
 #include <Components/StaticMeshComponent.h>
 #include <Components/BoxComponent.h>
 #include <GameFramework/SpringArmComponent.h>
@@ -37,6 +38,10 @@ ATankPawn::ATankPawn()
 
 	CannonSetupPoint = CreateDefaultSubobject<UArrowComponent>(TEXT("CannonSetupPoint"));
 	CannonSetupPoint->SetupAttachment(TurretMesh);
+
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+	HealthComponent->OnHealthChanget.AddUObject(this, &ATankPawn::DamageTaked);
+	HealthComponent->OnDie.AddUObject(this, &ATankPawn::Die);
 }
 
  //Called when the game starts or when spawned
@@ -156,6 +161,24 @@ void ATankPawn::AddAmmo(int sum)
 	if (Cannon) {
 		Cannon->AddAmmo(sum);
 	}
+}
+
+void ATankPawn::TakeDamage(FDamageData DamageData)
+{
+	HealthComponent->TakeDamage(DamageData);
+}
+
+void ATankPawn::DamageTaked(float Value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Health: %f"), HealthComponent->GetHealth());
+}
+
+void ATankPawn::Die()
+{
+	if (Cannon) {
+		Cannon->Destroy();
+	}
+	Destroy();
 }
 
 

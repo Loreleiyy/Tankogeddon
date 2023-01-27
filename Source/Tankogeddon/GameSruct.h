@@ -18,6 +18,16 @@ enum class ECannonType : uint8
 	FireSeries = 2 UMETA(DisplayName = "Use series")
 };
 
+USTRUCT()
+struct FDamageData {
+	GENERATED_BODY()
+
+	float DamageValue;
+	AActor* Instigator;
+	AActor* DamageMaker;
+};
+
+
 UCLASS()
 class TANKOGEDDON_API UGameSruct : public UObject
 {

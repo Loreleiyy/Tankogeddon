@@ -33,9 +33,20 @@ void ACannon::Fire()
 		PoolProjectile.Reserve(CountAmmunition);
 		for (int i = 0; i < CountAmmunition; ++i) {
 			FVector local = FVector(0, 0, -100 - i * 100);		// снаряды спратаны, пока в пуле
-			PoolProjectile.Add(GetWorld()->SpawnActor<AProjectile>(PrjectileClass,     // не знаю, как правильнее создавать
-				local, ProjectileSpawnPoint->GetComponentRotation()));
-			PoolProjectile[i]->setLocal(local);
+
+			AProjectile* tempProjectile = GetWorld()->SpawnActor<AProjectile>(PrjectileClass,
+				local, ProjectileSpawnPoint->GetComponentRotation());
+			if (tempProjectile) {
+				tempProjectile->setLocal(local);
+				PoolProjectile.Add(tempProjectile);
+			}
+
+
+
+
+			//PoolProjectile.Add(GetWorld()->SpawnActor<AProjectile>(PrjectileClass,     // не знаю, как правильнее создавать
+			//	local, ProjectileSpawnPoint->GetComponentRotation()));
+			//PoolProjectile[i]->setLocal(local);
 		}
 	}
 	if (!IsReadyToFire()) {
