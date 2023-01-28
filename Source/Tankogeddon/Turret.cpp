@@ -46,17 +46,17 @@ ATurret::ATurret()
 	HealthComponent->OnDie.AddUObject(this, &ATurret::Die);
 }
 
-void ATurret::TakeDamage(FDamageData DamageData)
+void ATurret::TakeDamage(FDamageData DamageData)//
 {
 	HealthComponent->TakeDamage(DamageData);
 }
 
-void ATurret::Die()
+void ATurret::Die()//
 {
 	Destroy();
 }
 
-void ATurret::DamageTaked(float Value)
+void ATurret::DamageTaked(float Value)//
 {
 	UE_LOG(LogTemp, Warning, TEXT("Health: %f"), HealthComponent->GetHealth());
 }
@@ -68,7 +68,7 @@ void ATurret::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	SetupCannon(CannonClass);
+	SetupCannon(CannonClass);//
 
 	PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawn();
 
@@ -117,7 +117,7 @@ void ATurret::RotateToPlayer()
 	TurretMesh->SetWorldRotation(FMath::Lerp(currRotation, targetRotation, TargetingSpeed));
 }
 
-void ATurret::Fire()
+void ATurret::Fire()//
 {
 	if (Cannon) {
 		Cannon->Fire();

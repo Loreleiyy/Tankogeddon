@@ -47,13 +47,14 @@ void AProjectile::Stop()
 	deAvailable();
 	GetWorldTimerManager().ClearTimer(MovementTimer);
 	GetWorldTimerManager().ClearTimer(DisableTimer);
-	
+	SetActorEnableCollision(false);
 	SetActorLocation(startLocation);
 }
 
 void AProjectile::setLocal(FVector& start)
 {
 	startLocation = start;
+	SetActorLocation(startLocation);
 }
 
 
@@ -77,7 +78,7 @@ void AProjectile::OnMeshOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor
 	AActor* OwnewByOwner = owner != nullptr ? owner->GetOwner() : nullptr; // ATankPawn or ATurret
 
 
-	if (OtherActor != owner || OtherActor != OwnewByOwner) {
+	if (OtherActor != owner && OtherActor != OwnewByOwner) {
 		IDamageTaker* DamageActor = Cast<IDamageTaker>(OtherActor);
 		if (DamageActor) {
 			FDamageData DamageData;

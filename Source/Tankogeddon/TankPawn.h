@@ -32,13 +32,13 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-		UStaticMeshComponent* BodyMesh;
+		UStaticMeshComponent* BodyMesh;//
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-		UStaticMeshComponent* TurretMesh;
+		UStaticMeshComponent* TurretMesh;//
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-		UBoxComponent* BoxCollision;
+		UBoxComponent* BoxCollision;//
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 		USpringArmComponent* SpringArm;
@@ -47,19 +47,19 @@ protected:
 		UCameraComponent* Camera;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-		UHealthComponent* HealthComponent;
+		UHealthComponent* HealthComponent;//
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cannon")
-		ACannon* Cannon;
+		ACannon* Cannon;//
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cannon")
-		TSubclassOf< ACannon> CannonClass;
+		TSubclassOf< ACannon> CannonClass;//
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cannon")
 		TSubclassOf< ACannon> CannonClassAdditional;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cannon")
-		UArrowComponent* CannonSetupPoint;
+		UArrowComponent* CannonSetupPoint;//
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movements")
 		float MoveSpeed = 100.0f;
@@ -88,14 +88,14 @@ public:
 
 	void MoveRight(float Value);
 	void RotateRight(float Value);
-	void Fire();
+	void Fire();//
 	void FireSpecial();
-	void SetupCannnon(TSubclassOf<ACannon> newCannon);
+	void SetupCannnon(TSubclassOf<ACannon> newCannon);//
 	void Recharge();
 	void SwapCannon();
 	void AddAmmo(int sum);
 
-	virtual void TakeDamage(FDamageData DamageData) override;
+	virtual void TakeDamage(FDamageData DamageData) override;//
 
 	UFUNCTION()
 	void DamageTaked(float Value);

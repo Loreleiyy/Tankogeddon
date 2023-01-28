@@ -49,7 +49,8 @@ void ATankPawn::BeginPlay()
 {
 	Super::BeginPlay();
 	TankController = Cast<ATankPlayerController>(GetController());
-	SetupCannnon(CannonClass);
+	SetupCannnon(CannonClass);//
+	//SetActorEnableCollision(true);
 }
 
 // Called every frame
@@ -110,7 +111,7 @@ void ATankPawn::RotateRight(float Value)
 	targetRotateRightAxisValue = Value;
 }
 
-void ATankPawn::Fire()
+void ATankPawn::Fire()//
 {
 	if (Cannon) {
 		Cannon->Fire();
@@ -130,7 +131,7 @@ void ATankPawn::SetupCannnon(TSubclassOf<ACannon> newCannon)
 		return;
 	}
 	if (Cannon) {
-		Cannon->DestroyProjectile();
+		
 		Cannon->Destroy();
 	}
 	FActorSpawnParameters spawnParams;
@@ -163,17 +164,17 @@ void ATankPawn::AddAmmo(int sum)
 	}
 }
 
-void ATankPawn::TakeDamage(FDamageData DamageData)
+void ATankPawn::TakeDamage(FDamageData DamageData)//
 {
 	HealthComponent->TakeDamage(DamageData);
 }
 
-void ATankPawn::DamageTaked(float Value)
+void ATankPawn::DamageTaked(float Value)//
 {
 	UE_LOG(LogTemp, Warning, TEXT("Health: %f"), HealthComponent->GetHealth());
 }
 
-void ATankPawn::Die()
+void ATankPawn::Die()//
 {
 	if (Cannon) {
 		Cannon->Destroy();
