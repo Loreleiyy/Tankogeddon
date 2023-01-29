@@ -5,6 +5,7 @@
 #include "Cannon.h"
 #include "Projectile.h"
 #include "DamageTaker.h"
+#include "TankPawn.h"
 #include <Engine/Engine.h>
 #include <TimerManager.h>
 #include <DrawDebugHelpers.h>
@@ -97,7 +98,7 @@ void ACannon::Fire()
 }
 
 // альтернативный вариант стрельбы
-void ACannon::FireSpecial()
+void ACannon::FireSpecial()  // an alternative shooting option is shooting without delay
 {
 	if (!IsReadyToFire()) {
 		return;
@@ -162,6 +163,8 @@ void ACannon::AddAmmo(int sum)
 
 
 
+
+
 AProjectile* ACannon::FindProjectile()
 {
 	for (auto i : PoolProjectile) {
@@ -178,7 +181,9 @@ void ACannon::BeginPlay()
 	Super::BeginPlay();
 
 	bReadyToFire = true;
-	PoolInitial();
+	if (Cannontype == ECannonType::FireProjectile) {
+		PoolInitial();
+	}
 }
 
 void ACannon::Destroyed()
@@ -204,6 +209,10 @@ void ACannon::PoolInitial()
 		if (tempProjectile) {
 			tempProjectile->setLocal(local);
 			tempProjectile->SetActorEnableCollision(false);
+			ATankPawn* Tank = Cast<ATankPawn>(GetOwner());
+			if (Tank) {
+				tempProjectile->OnDieScore.AddUObject(Tank, &ATankPawn::AddScore);
+			}
 			PoolProjectile.Add(tempProjectile);
 		}
 		//PoolProjectile.Add(GetWorld()->SpawnActor<AProjectile>(PrjectileClass, 

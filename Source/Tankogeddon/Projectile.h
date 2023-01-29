@@ -15,6 +15,8 @@ UCLASS()
 class TANKOGEDDON_API AProjectile : public AActor
 {
 	GENERATED_BODY()
+
+	DECLARE_EVENT_OneParam(AProjectile, FOnDieScore, int);
 	
 public:	
 	// Sets default values for this actor's properties
@@ -26,6 +28,9 @@ public:
 	void Stop();
 	void setLocal(FVector &start);
 
+	FOnDieScore OnDieScore;
+
+	void AddScore(int score);
 
 protected:
 	// Called when the game starts or when spawned

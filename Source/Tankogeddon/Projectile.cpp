@@ -1,7 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Projectile.h"
+#include "Scorable.h"
 #include <Components/StaticMeshComponent.h>
 #include <Components/SphereComponent.h>
 #include "DamageTaker.h"
@@ -57,6 +58,13 @@ void AProjectile::setLocal(FVector& start)
 	SetActorLocation(startLocation);
 }
 
+void AProjectile::AddScore(int score)
+{
+	if (OnDieScore.IsBound()) {
+		OnDieScore.Broadcast(score);
+	}
+}
+
 
 
 // Called when the game starts or when spawned
@@ -87,11 +95,22 @@ void AProjectile::OnMeshOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor
 			DamageData.DamageMaker = this;
 
 			DamageActor->TakeDamage(DamageData);
+		
 		}
 		else {
 			UE_LOG(LogTemp, Warning, TEXT("Overlapped actor: %s"), *OtherActor->GetName());
+
 			OtherActor->Destroy();
 		}
+
+		IScorable* ScoreActor = Cast<IScorable>(OtherActor);
+		if (ScoreActor) {
+			if (ScoreActor->isDie()) {
+				int score = ScoreActor->GetScore();
+				AddScore(score);
+			}
+		}
+
 		Stop();
 	}
 }

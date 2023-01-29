@@ -2,7 +2,9 @@
 
 #pragma once
 
-#include "DamageTaker.h"
+//#include "DamageTaker.h"
+#include "HeavyGunsPawn.h"
+#include "Scorable.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Turret.generated.h"
@@ -17,7 +19,7 @@ class UHealthComponent;
 
 
 UCLASS()
-class TANKOGEDDON_API ATurret : public AActor, public IDamageTaker
+class TANKOGEDDON_API ATurret : public AHeavyGunsPawn, public IScorable
 {
 	GENERATED_BODY()
 	
@@ -26,36 +28,42 @@ public:
 	ATurret();
 
 	UFUNCTION()
-	virtual void TakeDamage(FDamageData DamageData) override;//
+	virtual int GetScore() override;
 
 	UFUNCTION()
-	void Die();
+	virtual bool isDie() override;
 
-	UFUNCTION()
-	void DamageTaked(float Value);
+	//UFUNCTION()
+	//virtual void TakeDamage(FDamageData DamageData) override;//
+
+	//UFUNCTION()
+	//void Die();//
+
+	//UFUNCTION()
+	//void DamageTaked(float Value);//
 
 protected:
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-		UStaticMeshComponent* BodyMesh;//
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+	//	UStaticMeshComponent* BodyMesh;//
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-		UStaticMeshComponent* TurretMesh;//
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+	//	UStaticMeshComponent* TurretMesh;//
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-		UArrowComponent* CannonSetupPoint;//
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+	//	UArrowComponent* CannonSetupPoint;//
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-		UBoxComponent* HitCollider;//
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+	//	UBoxComponent* HitCollider;//
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-		UHealthComponent* HealthComponent;//
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+	//	UHealthComponent* HealthComponent;//
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cannon")
-		TSubclassOf<ACannon> CannonClass;//
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cannon")
+	//	TSubclassOf<ACannon> CannonClass;//
 
-	UPROPERTY()
-		ACannon* Cannon;//
+	//UPROPERTY()
+	//	ACannon* Cannon;//
 
 	UPROPERTY()
 		APawn* PlayerPawn;
@@ -72,16 +80,19 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Targeting")
 		float Accurency = 10.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Score")
+		int Score = 10;
+
 	const FString BodyMeshPath = "StaticMesh'/Game/CSC/Meshes/SM_CSC_Tower1.SM_CSC_Tower1'";
 	const FString TurretMeshPath = "StaticMesh'/Game/CSC/Meshes/SM_CSC_Gun1.SM_CSC_Gun1'";
 
 	virtual void BeginPlay() override;
 	virtual void Destroyed() override;
 
-	void SetupCannon(TSubclassOf<ACannon> newCannonClass);//
+	//void SetupCannon(TSubclassOf<ACannon> newCannonClass);//
 	void Targeting();
 	void RotateToPlayer();
-	void Fire();//
+	//void Fire();//
 	bool IsPlayerInRange();
 	bool CanFire();
 

@@ -22,6 +22,7 @@ public:
 
 	AHeavyGunsPawn();
 
+	UFUNCTION()
 	virtual void TakeDamage(FDamageData DamageData) override;
 
 	UFUNCTION()
@@ -54,10 +55,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cannon")
 		UArrowComponent* CannonSetupPoint;
-
+public:
+ 
 	void SetupCannon(TSubclassOf<ACannon> newCannonClass);
 	void Fire();
-
-public:	
-	
 };

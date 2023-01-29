@@ -31,6 +31,7 @@ public:
 	void TimeRate();
 	void AddAmmo(int sum);
 
+
 	AProjectile* FindProjectile();
 
 protected:
