@@ -50,6 +50,10 @@ void AHeavyGunsPawn::BeginPlay()
 {
 	Super::BeginPlay();
 	SetupCannon(CannonClass);
+	APawn* PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawn();
+	if (PlayerPawn != this) {
+		GetWorldTimerManager().SetTimer(ChangeTimer, this, &AHeavyGunsPawn::SwapCannon, ChangeCannonTime, true);
+	}
 }
 
 void AHeavyGunsPawn::SetupCannon(TSubclassOf<ACannon> newCannonClass)
@@ -71,7 +75,18 @@ void AHeavyGunsPawn::SetupCannon(TSubclassOf<ACannon> newCannonClass)
 
 void AHeavyGunsPawn::Fire()
 {
+	
 	if (Cannon) {
+		
 		Cannon->Fire();
 	}
+	
+}
+
+void AHeavyGunsPawn::SwapCannon()
+{
+	TSubclassOf<ACannon> TempClass = CannonClass;
+	SetupCannon(CannonClassAdditional);
+	
+	CannonClassAdditional = TempClass;
 }

@@ -134,19 +134,13 @@ void ATankPawn::Recharge()
 	}
 }
 
-void ATankPawn::SwapCannon()
-{
-	TSubclassOf<ACannon> TempClass = CannonClass;
-	SetupCannon(CannonClassAdditional);
-	
-	CannonClassAdditional = TempClass;
-}
 
 void ATankPawn::AddAmmo(int sum)
 {
 	if (Cannon) {
 		Cannon->AddAmmo(sum);
 	}
+	
 }
 
 void ATankPawn::AddScore(int score)

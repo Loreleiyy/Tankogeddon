@@ -11,6 +11,7 @@
 #include <Components/ArrowComponent.h>
 #include <Components/BoxComponent.h>
 #include <Engine/StaticMesh.h>
+#include <DrawDebugHelpers.h>
 
 
 
@@ -74,9 +75,9 @@ void ATurret::Targeting()
 		return;
 	}
 
-	if (IsPlayerInRange()) {
+	if (IsPlayerInRange() ) {
 		RotateToPlayer();
-		if (CanFire()) {
+		if (CanFire() && isPlayerSeen()) {
 			Fire();
 		}
 	}
@@ -105,6 +106,28 @@ bool ATurret::CanFire()
 
 	float aimAngle = FMath::RadiansToDegrees(acoshf(FVector::DotProduct(targetDir, DirToPlayer)));
 	return aimAngle <= Accurency;
+}
+
+bool ATurret::isPlayerSeen()
+{
+	FVector playerPos = PlayerPawn->GetActorLocation();
+	FVector eyesPos = CannonSetupPoint->GetComponentLocation();
+	FCollisionQueryParams params = FCollisionQueryParams();
+	params.AddIgnoredActor(this);
+
+	FHitResult hitResult;
+
+	if (GetWorld()->LineTraceSingleByChannel(hitResult, eyesPos, playerPos, ECollisionChannel::ECC_Visibility, params)) {
+		if (hitResult.GetActor()) {
+			if (hitResult.GetActor() == PlayerPawn) {
+				DrawDebugLine(GetWorld(), eyesPos, hitResult.Location, FColor::Green, false, 0.5f, 0, 5);
+			}
+			DrawDebugLine(GetWorld(), eyesPos, hitResult.Location, FColor::Purple, false, 0.5f, 0, 5);
+			return hitResult.GetActor() == PlayerPawn;
+		}
+	}
+	DrawDebugLine(GetWorld(), eyesPos, hitResult.Location, FColor::Red, false, 0.5f, 0, 5);
+	return false;
 }
 
 

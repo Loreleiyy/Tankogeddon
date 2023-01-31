@@ -48,9 +48,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 		UCameraComponent* Camera;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cannon")
-		TSubclassOf< ACannon> CannonClassAdditional;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI", Meta = (MakeEditWidget = true))
 		TArray<FVector> PatrollingPath;
 
@@ -90,7 +87,7 @@ public:
 	void FireSpecial();
 	
 	void Recharge();
-	void SwapCannon();
+
 	void AddAmmo(int sum);
 	void AddScore(int score);
 

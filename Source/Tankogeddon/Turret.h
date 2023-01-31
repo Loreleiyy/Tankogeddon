@@ -70,6 +70,8 @@ protected:
 	bool IsPlayerInRange();
 	bool CanFire();
 
+	bool isPlayerSeen();
+
 //public:	
 //	
 //	virtual void Tick(float DeltaTime) override;

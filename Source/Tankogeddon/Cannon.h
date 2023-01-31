@@ -85,6 +85,8 @@ protected:
 	FTimerHandle ReloadTimer;
 	FTimerHandle SeriesAmmoTimer;
 	int countAmmo;
+	void FireProjectile();
+	void FireTrace();
 
 public:	
 	// Called every frame
