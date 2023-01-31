@@ -9,6 +9,9 @@
 #include <Engine/Engine.h>
 #include <TimerManager.h>
 #include <DrawDebugHelpers.h>
+#include <Particles/ParticleSystemComponent.h>
+#include <Components/AudioComponent.h>
+#include <Camera/CameraShakeBase.h>
 
 // Sets default values
 ACannon::ACannon()
@@ -21,12 +24,18 @@ ACannon::ACannon()
 
 	CannonMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CannonMesh"));
 	CannonMesh->SetupAttachment(SceneComp);
+	CannonMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	ProjectileSpawnPoint = CreateDefaultSubobject<UArrowComponent>(TEXT("ArrowComponent"));
 	ProjectileSpawnPoint->SetupAttachment(CannonMesh);
 
-	
-	
+	ShotEffect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ShotEffect"));
+	ShotEffect->SetupAttachment(ProjectileSpawnPoint);
+	ShotEffect->SetAutoActivate(false);
+
+	AudioEffect = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	AudioEffect->SetupAttachment(SceneComp);
+	AudioEffect->SetAutoActivate(false);
 }
 
 void ACannon::Fire()
@@ -67,7 +76,7 @@ void ACannon::Fire()
 			AActor* OverlappedActor = hitResult.GetActor();
 			if (OverlappedActor) {
 				UE_LOG(LogTemp, Warning, TEXT("Actor: %s"), *OverlappedActor->GetName());
-				//OverlappedActor->Destroy();
+				
 				IDamageTaker* damageActor = Cast<IDamageTaker>(OverlappedActor);
 				if (damageActor) {
 					FDamageData damageData;
@@ -95,6 +104,17 @@ void ACannon::Fire()
 		GetWorld()->GetTimerManager().SetTimer(SeriesAmmoTimer, this, &ACannon::FireSeries, FireRate / 4, true);
 	}
 
+	if (ShotEffect) {
+		ShotEffect->ActivateSystem();
+	}
+
+	if (AudioEffect) {
+		AudioEffect->Play();
+	}
+
+	if (CameraShake) {
+		GetWorld()->GetFirstPlayerController()->ClientPlayCameraShake(CameraShake);
+	}
 }
 
 // альтернативный вариант стрельбы
@@ -207,8 +227,9 @@ void ACannon::PoolInitial()
 		AProjectile* tempProjectile = GetWorld()->SpawnActor<AProjectile>(PrjectileClass,
 			param);
 		if (tempProjectile) {
-			tempProjectile->setLocal(local);
 			tempProjectile->SetActorEnableCollision(false);
+			tempProjectile->setLocal(local);
+			
 			ATankPawn* Tank = Cast<ATankPawn>(GetOwner());
 			if (Tank) {
 				tempProjectile->OnDieScore.AddUObject(Tank, &ATankPawn::AddScore);

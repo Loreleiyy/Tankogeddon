@@ -11,7 +11,9 @@
 class UStaticMeshComponent;
 class UArrowComponent;
 class AProjectile;
-
+class UParticleSystemComponent;
+class UAudioComponent;
+class UCameraShakeBase;
 
 UCLASS()
 class TANKOGEDDON_API ACannon : public AActor
@@ -67,6 +69,15 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fire params")
 		int SumCountAmmunition = 10; // общее колличество снарядов
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
+		UParticleSystemComponent* ShotEffect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
+		UAudioComponent* AudioEffect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
+		TSubclassOf<UCameraShakeBase> CameraShake;
 
 	void PoolInitial();
 

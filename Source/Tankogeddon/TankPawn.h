@@ -28,18 +28,19 @@ public:
 	// Sets default values for this pawn's properties
 	ATankPawn();
 
+	TArray<FVector> GetPatrollingPath() const { return PatrollingPath; }
+	float GetMovementAccurency() const { return MovementAccurency; }
+
+	FVector GetTurretForwardVector() const;
+	void RotateTurretTo(FVector TargetPosition);
+
+	FVector GetEyesPosition() const;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-/*	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-		UStaticMeshComponent* BodyMesh;*///
 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-	//	UStaticMeshComponent* TurretMesh;//
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-	//	UBoxComponent* BoxCollision;//
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 		USpringArmComponent* SpringArm;
@@ -47,20 +48,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 		UCameraComponent* Camera;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-	//	UHealthComponent* HealthComponent;//
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cannon")
-	//	ACannon* Cannon;//
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cannon")
-	//	TSubclassOf< ACannon> CannonClass;//
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cannon")
 		TSubclassOf< ACannon> CannonClassAdditional;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cannon")
-	//	UArrowComponent* CannonSetupPoint;//
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI", Meta = (MakeEditWidget = true))
+		TArray<FVector> PatrollingPath;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+		float MovementAccurency = 50;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movements")
 		float MoveSpeed = 100.0f;
@@ -91,22 +86,15 @@ public:
 
 	void MoveRight(float Value);
 	void RotateRight(float Value);
-	//void Fire();//
+	
 	void FireSpecial();
-	//void SetupCannnon(TSubclassOf<ACannon> newCannon);//
+	
 	void Recharge();
 	void SwapCannon();
 	void AddAmmo(int sum);
 	void AddScore(int score);
 
-	//virtual void TakeDamage(FDamageData DamageData) override;//
-
-	//UFUNCTION()
-	//void DamageTaked(float Value);//
-
-	//UFUNCTION()
-	//void Die();//
-
+	
 	// Called to bind functionality to input
 	//virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 

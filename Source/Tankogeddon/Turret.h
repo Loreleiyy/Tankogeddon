@@ -33,37 +33,11 @@ public:
 	UFUNCTION()
 	virtual bool isDie() override;
 
-	//UFUNCTION()
-	//virtual void TakeDamage(FDamageData DamageData) override;//
 
-	//UFUNCTION()
-	//void Die();//
-
-	//UFUNCTION()
-	//void DamageTaked(float Value);//
 
 protected:
 	
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-	//	UStaticMeshComponent* BodyMesh;//
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-	//	UStaticMeshComponent* TurretMesh;//
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-	//	UArrowComponent* CannonSetupPoint;//
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-	//	UBoxComponent* HitCollider;//
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-	//	UHealthComponent* HealthComponent;//
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cannon")
-	//	TSubclassOf<ACannon> CannonClass;//
-
-	//UPROPERTY()
-	//	ACannon* Cannon;//
+	
 
 	UPROPERTY()
 		APawn* PlayerPawn;
@@ -89,10 +63,10 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Destroyed() override;
 
-	//void SetupCannon(TSubclassOf<ACannon> newCannonClass);//
+	
 	void Targeting();
 	void RotateToPlayer();
-	//void Fire();//
+	
 	bool IsPlayerInRange();
 	bool CanFire();
 
