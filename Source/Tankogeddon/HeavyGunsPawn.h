@@ -59,14 +59,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cannon")
 		UArrowComponent* CannonSetupPoint;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cannon")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Timer")
 		float ChangeCannonTime = 5.0f;
 
-	FTimerHandle ChangeTimer;
+	
 	
 public:
  
 	void SetupCannon(TSubclassOf<ACannon> newCannonClass);
 	void Fire();
 	void SwapCannon();
+	void SpawnCannonTime();
 };

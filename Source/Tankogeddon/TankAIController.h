@@ -33,13 +33,16 @@ protected:
 		float MovementAccurency = 0.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Targeting")
-		float TargetingRange = 1000.0f;
+		float TargetingRange = 2000.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Targeting")
 		float TargetingSpeed = 0.1f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Targeting")
 		float Accurency = 10.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Timer")
+		float ChangeCannonTime = 5.0f;
 
 	int32 CurrentPatrollingIndex = 0;
 
@@ -51,4 +54,7 @@ protected:
 	void Fire();
 
 	bool IsPlayerSeen();
+	void RangeTime();
+	bool bplayerRange = false;
+	FTimerHandle RangeTimer;
 };

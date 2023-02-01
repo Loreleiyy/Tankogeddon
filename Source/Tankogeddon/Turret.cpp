@@ -60,6 +60,7 @@ void ATurret::BeginPlay()
 
 	FTimerHandle TargetingTimer;
 	GetWorldTimerManager().SetTimer(TargetingTimer, this, &ATurret::Targeting, TargetingRate, true, TargetingRate);
+	GetWorldTimerManager().SetTimer(RangeTimer, this, &ATurret::RangeTime, ChangeCannonTime, true);
 }
 
 void ATurret::Destroyed()
@@ -74,8 +75,8 @@ void ATurret::Targeting()
 	if (!PlayerPawn) {
 		return;
 	}
-
-	if (IsPlayerInRange() ) {
+	bplayerRange = IsPlayerInRange();
+	if (bplayerRange) {
 		RotateToPlayer();
 		if (CanFire() && isPlayerSeen()) {
 			Fire();
@@ -128,6 +129,13 @@ bool ATurret::isPlayerSeen()
 	}
 	DrawDebugLine(GetWorld(), eyesPos, hitResult.Location, FColor::Red, false, 0.5f, 0, 5);
 	return false;
+}
+
+void ATurret::RangeTime()
+{
+	if(bplayerRange){
+		SpawnCannonTime();
+	}
 }
 
 

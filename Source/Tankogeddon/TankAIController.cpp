@@ -36,6 +36,7 @@ void ATankAIController::BeginPlay()
 	}
 
 	CurrentPatrollingIndex = 0;
+	GetWorldTimerManager().SetTimer(RangeTimer, this, &ATankAIController::RangeTime, ChangeCannonTime, true);
 }
 
 float ATankAIController::GetRotationValue()
@@ -71,7 +72,8 @@ float ATankAIController::GetRotationValue()
 
 void ATankAIController::Targeting()
 {
-	if (!IsPlayerSeen() || !IsPlayerRange()) {
+	bplayerRange = IsPlayerRange();
+	if (!IsPlayerSeen() || !bplayerRange) {
 		return;
 	}
 	if (CanFire()) {
@@ -134,4 +136,11 @@ bool ATankAIController::IsPlayerSeen()
 	}
 	DrawDebugLine(GetWorld(), eyesPos, hitResult.Location, FColor::Red, false, 0.5f, 0, 5);
 	return false;
+}
+
+void ATankAIController::RangeTime()
+{
+	if (bplayerRange) {
+		TankPawn->SpawnCannonTime();
+	}
 }

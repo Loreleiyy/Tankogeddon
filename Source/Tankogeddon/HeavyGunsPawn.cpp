@@ -50,10 +50,7 @@ void AHeavyGunsPawn::BeginPlay()
 {
 	Super::BeginPlay();
 	SetupCannon(CannonClass);
-	APawn* PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawn();
-	if (PlayerPawn != this) {
-		GetWorldTimerManager().SetTimer(ChangeTimer, this, &AHeavyGunsPawn::SwapCannon, ChangeCannonTime, true);
-	}
+
 }
 
 void AHeavyGunsPawn::SetupCannon(TSubclassOf<ACannon> newCannonClass)
@@ -89,4 +86,16 @@ void AHeavyGunsPawn::SwapCannon()
 	SetupCannon(CannonClassAdditional);
 	
 	CannonClassAdditional = TempClass;
+}
+
+// Called from Turret or TankAIController
+// if the player is nearby, the cannon changes every 5 seconds
+void AHeavyGunsPawn::SpawnCannonTime()
+{
+	
+	APawn* PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawn();
+	if (PlayerPawn != this) {
+		
+		SwapCannon();
+	}
 }
