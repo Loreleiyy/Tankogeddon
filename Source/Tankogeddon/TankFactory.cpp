@@ -4,6 +4,7 @@
 #include "TankFactory.h"
 #include "HealthComponent.h"
 #include "TankPawn.h"
+#include "MapLoader.h"
 #include <Components/BoxComponent.h>
 #include <Components/StaticMeshComponent.h>
 #include <Components/ArrowComponent.h>
@@ -30,6 +31,10 @@ ATankFactory::ATankFactory()
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 	HealthComponent->OnHealthChanget.AddUObject(this, &ATankFactory::DamageTaked);
 	HealthComponent->OnDie.AddUObject(this, &ATankFactory::Die);
+
+	DestroyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DestroyMesh"));
+	DestroyMesh->SetupAttachment(BoxCollision);
+	
 }
 
 void ATankFactory::TakeDamage(FDamageData DamageData)
@@ -42,9 +47,9 @@ void ATankFactory::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	FTimerHandle spawnTimer;
+	
 	GetWorldTimerManager().SetTimer(spawnTimer, this, &ATankFactory::SpawnNewTank, SpawnTankRate, true, SpawnTankRate);
-
+	DestroyMesh->SetHiddenInGame(true);
 }
 
 void ATankFactory::DamageTaked(float DamageValue)
@@ -54,7 +59,13 @@ void ATankFactory::DamageTaked(float DamageValue)
 
 void ATankFactory::Die()
 {
-	Destroy();
+	if (MapLoader) {
+		MapLoader->FactoryDestroy();
+	}
+	GetWorldTimerManager().ClearTimer(spawnTimer);
+	BuildingMesh->SetHiddenInGame(true);
+	DestroyMesh->SetHiddenInGame(false);
+	SetActorEnableCollision(false);
 }
 
 void ATankFactory::SpawnNewTank()

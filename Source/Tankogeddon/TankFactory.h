@@ -13,6 +13,7 @@ class UBoxComponent;
 class UHealthComponent;
 class ATankPawn;
 class ATargetPoint;
+class AMapLoader;
 
 UCLASS()
 class TANKOGEDDON_API ATankFactory : public AActor, public IDamageTaker
@@ -33,6 +34,9 @@ protected:
 		UStaticMeshComponent* BuildingMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+		UStaticMeshComponent* DestroyMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 		UArrowComponent* TankSpawnPoint;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
@@ -50,6 +54,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn params")
 		TArray<ATargetPoint*> TankWayPoints;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapLoader")
+		AMapLoader* MapLoader;
+
 	UFUNCTION()
 	void DamageTaked(float DamageValue);
 
@@ -57,6 +64,8 @@ protected:
 	void Die();
 
 	void SpawnNewTank();
+
+	FTimerHandle spawnTimer;
 
 	//virtual void Tick(float DeltaTime) override;
 };

@@ -22,6 +22,9 @@ void ATankPlayerController::Tick(float DeltaSecond)
 {
 	Super::Tick(DeltaSecond);
 
+	if (!TankPawn) {
+		return;
+	}
 	FVector MouseDirection;
 	DeprojectMousePositionToWorld(MousePos, MouseDirection);
 	FVector PawnPosition = TankPawn->GetActorLocation();

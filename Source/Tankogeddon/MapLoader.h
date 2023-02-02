@@ -8,7 +8,8 @@
 
 class UStaticMeshComponent;
 class UBoxComponent;
-
+class UPrimitiveComponent;
+class ATankFactory;
 
 UCLASS()
 class TANKOGEDDON_API AMapLoader : public AActor
@@ -18,9 +19,12 @@ class TANKOGEDDON_API AMapLoader : public AActor
 public:	
 	
 	AMapLoader();
+	void FactoryDestroy();
 
 protected:
-	
+
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 		UStaticMeshComponent* MapLoaderMesh;
 
@@ -30,6 +34,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 		FName LevelName = "";
 
+	bool factoryDestroy = false;
+
+	UFUNCTION()
+		void OnMeshOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+			int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	//virtual void BeginPlay() override;
 	//virtual void Tick(float DeltaTime) override;

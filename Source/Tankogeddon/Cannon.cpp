@@ -235,7 +235,7 @@ void ACannon::FireTrace()
 			if (damageActor) {
 				FDamageData damageData;
 				damageData.DamageValue = Damage;
-				damageData.Instigator = this;
+				damageData.Instigator = GetOwner();
 				damageData.DamageMaker = this;
 
 				damageActor->TakeDamage(damageData);

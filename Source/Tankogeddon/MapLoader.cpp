@@ -2,8 +2,10 @@
 
 
 #include "MapLoader.h"
+#include "TankPawn.h"
 #include <Components/BoxComponent.h>
 #include <Components/StaticMeshComponent.h>
+#include <Kismet/GameplayStatics.h>
 
 AMapLoader::AMapLoader()
 {
@@ -18,6 +20,23 @@ AMapLoader::AMapLoader()
 
 	MapLoaderMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MapLoaderMesh"));
 	MapLoaderMesh->SetupAttachment(BoxCollision);
+
+	MapLoaderMesh->OnComponentBeginOverlap.AddDynamic(this, &AMapLoader::OnMeshOverlapBegin);
+}
+
+void AMapLoader::FactoryDestroy()
+{
+	factoryDestroy = true;
+}
+
+void AMapLoader::OnMeshOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+
+	APawn* PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawn();
+
+	if (PlayerPawn && PlayerPawn == OtherActor && factoryDestroy) {
+		UGameplayStatics::OpenLevel(GetWorld(), LevelName);
+	}
 }
 
 
