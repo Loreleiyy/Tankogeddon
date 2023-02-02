@@ -55,6 +55,9 @@ protected:
 
 	bool IsPlayerSeen();
 	void RangeTime();
+	void Initialize();
+
+
 	bool bplayerRange = false;
 	FTimerHandle RangeTimer;
 };

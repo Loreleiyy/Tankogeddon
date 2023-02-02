@@ -17,6 +17,7 @@ class ATankPlayerController;
 class UArrowComponent;
 class ACannon;
 class UHealthComponent;
+class ATargetPoint;
 
 
 UCLASS()
@@ -28,7 +29,8 @@ public:
 	// Sets default values for this pawn's properties
 	ATankPawn();
 
-	TArray<FVector> GetPatrollingPath() const { return PatrollingPath; }
+	TArray<FVector> GetPatrollingPath() const;
+	void SetPatrollingPath(TArray<ATargetPoint*> newPatrollingPath);
 	float GetMovementAccurency() const { return MovementAccurency; }
 
 	FVector GetTurretForwardVector() const;
@@ -49,7 +51,7 @@ protected:
 		UCameraComponent* Camera;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI", Meta = (MakeEditWidget = true))
-		TArray<FVector> PatrollingPath;
+		TArray<ATargetPoint*> PatrollingPath;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 		float MovementAccurency = 50;
