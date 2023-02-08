@@ -31,6 +31,7 @@ TArray<FVector> UPhysicsComponent::GenerateTrajectoty(FVector StartPos, FVector 
 	 for (float time = 0; time < MaxTime; time += TimeStep) {
 		 FVector position = StartPos + Velosity * time + GravityVector * time * time / 2;
 		 if (position.Z <= MinZValue) {
+			 UE_LOG(LogTemp, Warning, TEXT("Time: %f"), time);
 			 break;
 		 }
 		 trajectory.Add(position);

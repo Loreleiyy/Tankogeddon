@@ -23,7 +23,7 @@ public:
 protected:
 	virtual void Move() override;
 
-	void Explode();
+	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 		UPhysicsComponent* PhysicsComponent;
@@ -43,8 +43,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 		float TrajectorySpeed = 20.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-		float ExplodeRadius = 100.0f;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 		bool bShowTrajectory;

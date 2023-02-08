@@ -54,6 +54,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 		float lifeTime = 10.0f; // время жизни
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+		float ExplodeRadius = 100.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+		bool bExplode = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 		float PushForce = 1000.0f;
 
@@ -67,6 +73,9 @@ protected:
 	UFUNCTION()
 	void OnMeshOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	void Explode();
+	void DamageAndRepulsion(AActor* OtherActor);
 
 private:
 	bool bAvailable = true;

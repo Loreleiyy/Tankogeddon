@@ -22,7 +22,12 @@ void APhysicsProjectile::Start()
 {
 	moveVector = GetActorForwardVector() * TrajectorySpeed;
 	CurrentTrajectory = PhysicsComponent->GenerateTrajectoty(GetActorLocation(), moveVector, 
-		TrajectoryMaxTime, TrajectoryTimeStep, 0.0f);
+		TrajectoryMaxTime, TrajectoryTimeStep, GetActorLocation().Z - 1.0f);
+
+	FVector debugVector = CurrentTrajectory[CurrentTrajectory.Num() - 1];
+	float debugDistance = FVector::Distance(debugVector, GetActorLocation());
+	UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), debugDistance);
+	UE_LOG(LogTemp, Warning, TEXT("H: %f"), GetActorLocation().Z);
 
 	if (bShowTrajectory) {
 		for (FVector position : CurrentTrajectory) {
@@ -43,7 +48,7 @@ void APhysicsProjectile::Move()
 		++TrajectoryCurrentIndex;
 		if (TrajectoryCurrentIndex >= CurrentTrajectory.Num()) {
 			Explode();
-			Stop();
+			
 		}
 		else {
 			FRotator newRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), 
@@ -54,50 +59,4 @@ void APhysicsProjectile::Move()
 	}
 }
 
-void APhysicsProjectile::Explode()
-{
-	FVector startPos = GetActorLocation();
-	FVector endPos = startPos + FVector(0.1f);
 
-	FCollisionShape Shape = FCollisionShape::MakeSphere(ExplodeRadius);
-	FCollisionQueryParams params = FCollisionQueryParams::DefaultQueryParam;
-	params.AddIgnoredActor(this);
-	params.bTraceComplex = true;
-	params.TraceTag = "Explode Trace";
-
-	TArray<FHitResult> AttachHit;
-	FQuat Rotation = FQuat::Identity;
-
-	bool bSweepResult = GetWorld()->SweepMultiByChannel(AttachHit, startPos, endPos, Rotation,
-		ECollisionChannel::ECC_Visibility, Shape, params);
-
-	DrawDebugSphere(GetWorld(), startPos, ExplodeRadius, 5, FColor::Green, false, 2.0f);
-
-	if (bSweepResult) {
-		for (FHitResult hitResult : AttachHit) {
-			AActor* OtherActor = hitResult.GetActor();
-			if (!OtherActor) {
-				continue;
-			}
-
-			IDamageTaker* DamageTakeActor = Cast<IDamageTaker>(OtherActor);
-			if (DamageTakeActor) {
-				FDamageData damageData;
-				damageData.DamageValue = Damage;
-				damageData.Instigator = GetOwner();
-				damageData.DamageMaker = this;
-				DamageTakeActor->TakeDamage(damageData);
-			}
-			else {
-				UPrimitiveComponent* mesh = Cast<UPrimitiveComponent>(OtherActor->GetRootComponent());
-				if (mesh) {
-					if (mesh->IsSimulatingPhysics()) {
-						FVector forceVector = OtherActor->GetActorLocation() - GetActorLocation();
-						forceVector.Normalize();
-						mesh->AddImpulse(forceVector * PushForce, NAME_None, true);
-					}
-				}
-			}
-		}
-	}
-}
