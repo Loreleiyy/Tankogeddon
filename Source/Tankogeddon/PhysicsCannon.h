@@ -14,9 +14,19 @@ class TANKOGEDDON_API APhysicsCannon : public ACannon
 {
 	GENERATED_BODY()
 	
+public:
+	
+	
+
 protected:
+	virtual void BeginPlay() override;
 	virtual void FireProjectile() override;
 	virtual void PoolInitial() override;
+
 	APhysicsProjectile* FindProjectile();
+	
+
 	TArray<APhysicsProjectile*> PoolPHProjectile;
+	
+	APawn* PlayerPawn;
 };

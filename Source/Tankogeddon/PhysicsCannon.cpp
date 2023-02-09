@@ -7,18 +7,43 @@
 #include <Components/ArrowComponent.h>
 
 
+
+
+void APhysicsCannon::BeginPlay()
+{
+	Super::BeginPlay();
+
+	PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawn();
+}
+
 void APhysicsCannon::FireProjectile()
 {
 	GEngine->AddOnScreenDebugMessage(-1, FireRate, FColor::Purple,
 		FString::Printf(TEXT("Fire Projectile %d sum - %d"), --CountAmmunition, SumCountAmmunition));
 	APhysicsProjectile* Projectile = FindProjectile();
 
+	FRotator rotation = GetActorRotation();
+	UE_LOG(LogTemp, Warning, TEXT("Pitsh: %f Roll: %f Yaw: %f"), rotation.Pitch, rotation.Roll, rotation.Yaw);
+	
 	if (Projectile) {
-
-		Projectile->SetActorLocation(ProjectileSpawnPoint->GetComponentLocation());
+		FVector local = ProjectileSpawnPoint->GetComponentLocation();
+		Projectile->SetActorLocation(local);
 		Projectile->SetActorRotation(ProjectileSpawnPoint->GetComponentRotation());
 		Projectile->SetActorEnableCollision(true);
+
+		// horizontally the distance between the player and the projectile
+		local.Z = 0;
+		FVector PlayerLocal;
+		if (PlayerPawn) {
+			PlayerLocal = PlayerPawn->GetActorLocation();
+		}
+		PlayerLocal.Z = 0;
+		float distance = FVector::Distance(local, PlayerLocal);
+		UE_LOG(LogTemp, Warning, TEXT("PlayerRange: %f"), distance);
+		float initSpeed = Projectile->GetInitialSpeed(distance, GetActorRotation().Pitch);
+		Projectile->SetTrajectorySpeed(initSpeed);
 		Projectile->Start();
+		
 	}
 }
 
@@ -55,3 +80,4 @@ APhysicsProjectile* APhysicsCannon::FindProjectile()
 	}
 	return nullptr;
 }
+

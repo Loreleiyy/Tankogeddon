@@ -76,6 +76,7 @@ protected:
 	void RangeTime();
 	bool bplayerRange = false;
 	FTimerHandle RangeTimer;
+	float GetPlayerRange();
 
 //public:	
 //	

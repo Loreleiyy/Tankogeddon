@@ -76,6 +76,7 @@ protected:
 
 	void Explode();
 	void DamageAndRepulsion(AActor* OtherActor);
+	void TakeDamageOrImpulse(AActor* OtherActor, bool impulse);
 
 private:
 	bool bAvailable = true;

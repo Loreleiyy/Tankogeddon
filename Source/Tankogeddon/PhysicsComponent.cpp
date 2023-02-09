@@ -38,3 +38,8 @@ TArray<FVector> UPhysicsComponent::GenerateTrajectoty(FVector StartPos, FVector 
 	 }
 	 return trajectory;
 }
+
+float UPhysicsComponent::GetInitialSpeed(float distance, float angle)
+{
+	return sqrt((distance * (-Gravity)) / sin(FMath::DegreesToRadians(2*angle)));
+}

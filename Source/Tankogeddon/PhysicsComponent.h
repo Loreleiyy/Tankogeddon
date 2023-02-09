@@ -22,6 +22,9 @@ public:
 
 	TArray<FVector> GenerateTrajectoty(FVector StartPos, FVector Velosity, float MaxTime, float TimeStep, float MinZValue = 0);
 
+	float GetInitialSpeed(float distance, float angle);
+	
+
 protected:
 
 	//virtual void BeginPlay() override;

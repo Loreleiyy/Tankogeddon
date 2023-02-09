@@ -22,7 +22,7 @@ void APhysicsProjectile::Start()
 {
 	moveVector = GetActorForwardVector() * TrajectorySpeed;
 	CurrentTrajectory = PhysicsComponent->GenerateTrajectoty(GetActorLocation(), moveVector, 
-		TrajectoryMaxTime, TrajectoryTimeStep, GetActorLocation().Z - 1.0f);
+		TrajectoryMaxTime, TrajectoryTimeStep, GetActorLocation().Z - 5.0f);
 
 	FVector debugVector = CurrentTrajectory[CurrentTrajectory.Num() - 1];
 	float debugDistance = FVector::Distance(debugVector, GetActorLocation());
@@ -36,6 +36,16 @@ void APhysicsProjectile::Start()
 	}
 	TrajectoryCurrentIndex = 0;
 	Super::Start();
+}
+
+void APhysicsProjectile::SetTrajectorySpeed(float newTrajectorySpeed)
+{
+	TrajectorySpeed = newTrajectorySpeed;
+}
+
+float APhysicsProjectile::GetInitialSpeed(float distance, float angle)
+{
+	return PhysicsComponent->GetInitialSpeed(distance, angle);
 }
 
 void APhysicsProjectile::Move()

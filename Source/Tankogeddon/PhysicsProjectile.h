@@ -19,6 +19,9 @@ public:
 	APhysicsProjectile();
 
 	virtual void Start() override;
+
+	void SetTrajectorySpeed(float newTrajectorySpeed);
+	float GetInitialSpeed(float distance, float angle);
 	
 protected:
 	virtual void Move() override;

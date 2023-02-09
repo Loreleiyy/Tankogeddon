@@ -117,24 +117,7 @@ void AProjectile::Explode()
 				continue;
 			}
 
-			IDamageTaker* DamageTakeActor = Cast<IDamageTaker>(OtherActor);
-			if (DamageTakeActor) {
-				FDamageData damageData;
-				damageData.DamageValue = Damage;
-				damageData.Instigator = GetOwner();
-				damageData.DamageMaker = this;
-				DamageTakeActor->TakeDamage(damageData);
-			}
-			else {
-				UPrimitiveComponent* mesh = Cast<UPrimitiveComponent>(OtherActor->GetRootComponent());
-				if (mesh) {
-					if (mesh->IsSimulatingPhysics()) {
-						FVector forceVector = OtherActor->GetActorLocation() - GetActorLocation();
-						forceVector.Normalize();
-						mesh->AddImpulse(forceVector * PushForce, NAME_None, true);
-					}
-				}
-			}
+			TakeDamageOrImpulse(OtherActor, true);
 		}
 	}
 	Stop();
@@ -147,31 +130,8 @@ void AProjectile::DamageAndRepulsion(AActor* OtherActor)
 
 
 	if (OtherActor != owner && OtherActor != OwnewByOwner) {
-		IDamageTaker* DamageActor = Cast<IDamageTaker>(OtherActor);
-		if (DamageActor) {
-			FDamageData DamageData;
-			DamageData.DamageValue = Damage;
-			DamageData.Instigator = owner;
-			DamageData.DamageMaker = this;
-
-			DamageActor->TakeDamage(DamageData);
-
-		}
-		else {
-			UE_LOG(LogTemp, Warning, TEXT("Overlapped actor: %s"), *OtherActor->GetName());
-
-			UPrimitiveComponent* mesh = Cast<UPrimitiveComponent>(OtherActor->GetRootComponent());
-			if (mesh) {
-				if (mesh->IsSimulatingPhysics()) {
-					FVector forceVector = OtherActor->GetActorLocation() - GetActorLocation();
-					forceVector.Normalize();
-					mesh->AddForce(forceVector * PushForce, NAME_None, true);
-				}
-			}
-			else {
-				OtherActor->Destroy();
-			}
-		}
+		
+		TakeDamageOrImpulse(OtherActor, false);
 
 		IScorable* ScoreActor = Cast<IScorable>(OtherActor);
 		if (ScoreActor) {
@@ -182,6 +142,33 @@ void AProjectile::DamageAndRepulsion(AActor* OtherActor)
 		}
 
 		Stop();
+	}
+}
+
+void AProjectile::TakeDamageOrImpulse(AActor* OtherActor, bool impulse)
+{
+	IDamageTaker* DamageTakeActor = Cast<IDamageTaker>(OtherActor);
+	if (DamageTakeActor) {
+		FDamageData damageData;
+		damageData.DamageValue = Damage;
+		damageData.Instigator = GetOwner();
+		damageData.DamageMaker = this;
+		DamageTakeActor->TakeDamage(damageData);
+	}
+	else {
+		UPrimitiveComponent* mesh = Cast<UPrimitiveComponent>(OtherActor->GetRootComponent());
+		if (mesh) {
+			if (mesh->IsSimulatingPhysics()) {
+				FVector forceVector = OtherActor->GetActorLocation() - GetActorLocation();
+				forceVector.Normalize();
+				if (impulse) {
+					mesh->AddImpulse(forceVector * PushForce, NAME_None, true);
+				}
+				else {
+					mesh->AddForce(forceVector * PushForce, NAME_None, true);
+				}
+			}
+		}
 	}
 }
 

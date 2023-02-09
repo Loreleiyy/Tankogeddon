@@ -5,6 +5,7 @@
 #include "TankPlayerController.h"
 #include "Cannon.h"
 #include "HealthComponent.h"
+#include "PhysicsCannon.h"
 #include <Kismet/KismetMathLibrary.h>
 #include <TimerManager.h>
 #include <Components/StaticMeshComponent.h>
@@ -79,6 +80,7 @@ void ATurret::Targeting()
 	if (bplayerRange) {
 		RotateToPlayer();
 		if (CanFire() && isPlayerSeen()) {
+			
 			Fire();
 		}
 	}
@@ -96,7 +98,7 @@ void ATurret::RotateToPlayer()
 
 bool ATurret::IsPlayerInRange()
 {
-	return FVector::Distance(PlayerPawn->GetActorLocation(), GetActorLocation()) <= TargetingRange;
+	return GetPlayerRange() <= TargetingRange;
 }
 
 bool ATurret::CanFire()
@@ -136,6 +138,11 @@ void ATurret::RangeTime()
 	if(bplayerRange){
 		SpawnCannonTime();
 	}
+}
+
+float ATurret::GetPlayerRange()
+{
+	return FVector::Distance(PlayerPawn->GetActorLocation(), GetActorLocation());
 }
 
 
