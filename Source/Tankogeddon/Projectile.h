@@ -22,7 +22,7 @@ public:
 	// Sets default values for this actor's properties
 	AProjectile();
 
-	void Start();
+	virtual void Start();
 	bool isAvaivable() { return bAvailable; }
 	void deAvailable();
 	void Stop();
@@ -54,16 +54,29 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 		float lifeTime = 10.0f; // время жизни
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+		float ExplodeRadius = 100.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+		bool bExplode = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+		float PushForce = 1000.0f;
+
 	FTimerHandle MovementTimer;
 	FTimerHandle DisableTimer;
 	FVector startLocation;	// позиция в пуле снарядов
 
 	UFUNCTION()
-		void Move();
+		virtual void Move();
 
 	UFUNCTION()
 	void OnMeshOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	void Explode();
+	void DamageAndRepulsion(AActor* OtherActor);
+	void TakeDamageOrImpulse(AActor* OtherActor, bool impulse);
 
 private:
 	bool bAvailable = true;

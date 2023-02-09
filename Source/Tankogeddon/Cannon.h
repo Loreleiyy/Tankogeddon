@@ -79,13 +79,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
 		TSubclassOf<UCameraShakeBase> CameraShake;
 
-	void PoolInitial();
+	virtual void PoolInitial();
 
 	bool bReadyToFire = true;
 	FTimerHandle ReloadTimer;
 	FTimerHandle SeriesAmmoTimer;
 	int countAmmo;
-	void FireProjectile();
+	virtual void FireProjectile();
 	void FireTrace();
 
 public:	
