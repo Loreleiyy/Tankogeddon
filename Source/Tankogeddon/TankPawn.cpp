@@ -4,6 +4,7 @@
 #include "TankPawn.h"
 #include "Cannon.h"
 #include "TankPlayerController.h"
+#include "HealthComponent.h"
 #include <Components/StaticMeshComponent.h>
 #include <Components/BoxComponent.h>
 #include <GameFramework/SpringArmComponent.h>
@@ -11,22 +12,25 @@
 #include <Kismet/KismetMathLibrary.h>
 #include <Components/ArrowComponent.h>
 
-// Sets default values
+
 ATankPawn::ATankPawn()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	
 	PrimaryActorTick.bCanEverTick = true;
-	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("RootComponent"));
-	RootComponent = BoxCollision;
 
-	BodyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyMesh"));
-	BodyMesh->SetupAttachment(BoxCollision);
+	//BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("RootComponent"));
+	//RootComponent = BoxCollision;
+
+	//BodyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyMesh"));
+	//BodyMesh->SetupAttachment(BoxCollision);
+
+	
 
 	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TurretMesh"));
 	TurretMesh->SetupAttachment(BodyMesh);
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	SpringArm->SetupAttachment(BoxCollision);
+	SpringArm->SetupAttachment(BodyMesh);
 	SpringArm->bDoCollisionTest = false;
 	SpringArm->bInheritPitch = false;
 	SpringArm->bInheritRoll = false;
@@ -37,6 +41,10 @@ ATankPawn::ATankPawn()
 
 	CannonSetupPoint = CreateDefaultSubobject<UArrowComponent>(TEXT("CannonSetupPoint"));
 	CannonSetupPoint->SetupAttachment(TurretMesh);
+
+	//HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+	//HealthComponent->OnHealthChanget.AddUObject(this, &ATankPawn::DamageTaked);
+	//HealthComponent->OnDie.AddUObject(this, &ATankPawn::Die);
 }
 
  //Called when the game starts or when spawned
@@ -44,7 +52,8 @@ void ATankPawn::BeginPlay()
 {
 	Super::BeginPlay();
 	TankController = Cast<ATankPlayerController>(GetController());
-	SetupCannnon(CannonClass);
+	//SetupCannnon(CannonClass);//
+	//SetActorEnableCollision(true);
 }
 
 // Called every frame
@@ -105,12 +114,12 @@ void ATankPawn::RotateRight(float Value)
 	targetRotateRightAxisValue = Value;
 }
 
-void ATankPawn::Fire()
-{
-	if (Cannon) {
-		Cannon->Fire();
-	}
-}
+//void ATankPawn::Fire()//
+//{
+//	if (Cannon) {
+//		Cannon->Fire();
+//	}
+//}
 
 void ATankPawn::FireSpecial()
 {
@@ -119,22 +128,22 @@ void ATankPawn::FireSpecial()
 	}
 }
 
-void ATankPawn::SetupCannnon(TSubclassOf<ACannon> newCannon)
-{
-	if (!newCannon) {
-		return;
-	}
-	if (Cannon) {
-		Cannon->DestroyProjectile();
-		Cannon->Destroy();
-	}
-	FActorSpawnParameters spawnParams;
-	spawnParams.Instigator = this;
-	spawnParams.Owner = this;
-	CannonClass = newCannon;
-	Cannon = GetWorld()->SpawnActor<ACannon>(newCannon, spawnParams);
-	Cannon->AttachToComponent(CannonSetupPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-}
+//void ATankPawn::SetupCannnon(TSubclassOf<ACannon> newCannon)
+//{
+//	if (!newCannon) {
+//		return;
+//	}
+//	if (Cannon) {
+//		
+//		Cannon->Destroy();
+//	}
+//	FActorSpawnParameters spawnParams;
+//	spawnParams.Instigator = this;
+//	spawnParams.Owner = this;
+//	CannonClass = newCannon;
+//	Cannon = GetWorld()->SpawnActor<ACannon>(newCannon, spawnParams);
+//	Cannon->AttachToComponent(CannonSetupPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+//}
 
 void ATankPawn::Recharge()
 {
@@ -146,7 +155,7 @@ void ATankPawn::Recharge()
 void ATankPawn::SwapCannon()
 {
 	TSubclassOf<ACannon> TempClass = CannonClass;
-	SetupCannnon(CannonClassAdditional);
+	SetupCannon(CannonClassAdditional);
 	
 	CannonClassAdditional = TempClass;
 }
@@ -157,6 +166,30 @@ void ATankPawn::AddAmmo(int sum)
 		Cannon->AddAmmo(sum);
 	}
 }
+
+void ATankPawn::AddScore(int score)
+{
+	GameScore += score;
+	UE_LOG(LogTemp, Warning, TEXT("Score: %d"), GameScore);
+}
+
+//void ATankPawn::TakeDamage(FDamageData DamageData)//
+//{
+//	HealthComponent->TakeDamage(DamageData);
+//}
+
+//void ATankPawn::DamageTaked(float Value)//
+//{
+//	UE_LOG(LogTemp, Warning, TEXT("Health: %f"), HealthComponent->GetHealth());
+//}
+
+//void ATankPawn::Die()//
+//{
+//	if (Cannon) {
+//		Cannon->Destroy();
+//	}
+//	Destroy();
+//}
 
 
 // Called to bind functionality to input

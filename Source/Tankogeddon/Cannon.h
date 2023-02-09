@@ -30,12 +30,14 @@ public:
 	void Recharge();
 	void TimeRate();
 	void AddAmmo(int sum);
-	void DestroyProjectile();
+
+
 	AProjectile* FindProjectile();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void Destroyed() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 		UStaticMeshComponent* CannonMesh;
@@ -66,11 +68,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fire params")
 		int SumCountAmmunition = 10; // общее колличество снарядов
 
+	void PoolInitial();
+
 	bool bReadyToFire = true;
 	FTimerHandle ReloadTimer;
 	FTimerHandle SeriesAmmoTimer;
 	int countAmmo;
-	bool start = true;
+
 public:	
 	// Called every frame
 	//virtual void Tick(float DeltaTime) override;

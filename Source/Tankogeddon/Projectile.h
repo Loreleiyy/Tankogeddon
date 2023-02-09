@@ -8,12 +8,15 @@
 
 class UStaticMeshComponent;
 class UPrimitiveComponent;
+class USphereComponent;
 
 
 UCLASS()
 class TANKOGEDDON_API AProjectile : public AActor
 {
 	GENERATED_BODY()
+
+	DECLARE_EVENT_OneParam(AProjectile, FOnDieScore, int);
 	
 public:	
 	// Sets default values for this actor's properties
@@ -25,6 +28,9 @@ public:
 	void Stop();
 	void setLocal(FVector &start);
 
+	FOnDieScore OnDieScore;
+
+	void AddScore(int score);
 
 protected:
 	// Called when the game starts or when spawned
@@ -32,6 +38,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 		UStaticMeshComponent* ProjectileMesh;
+
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+	//	USphereComponent* SphereCollision;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 		float MoveSpeed = 100.0f;

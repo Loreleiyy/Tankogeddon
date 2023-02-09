@@ -4,6 +4,8 @@
 #include <Components/ArrowComponent.h>
 #include "Cannon.h"
 #include "Projectile.h"
+#include "DamageTaker.h"
+#include "TankPawn.h"
 #include <Engine/Engine.h>
 #include <TimerManager.h>
 #include <DrawDebugHelpers.h>
@@ -24,20 +26,12 @@ ACannon::ACannon()
 	ProjectileSpawnPoint->SetupAttachment(CannonMesh);
 
 	
+	
 }
 
 void ACannon::Fire()
 {
-	if (start) {
-		start = false;
-		PoolProjectile.Reserve(CountAmmunition);
-		for (int i = 0; i < CountAmmunition; ++i) {
-			FVector local = FVector(0, 0, -100 - i * 100);		// снаряды спратаны, пока в пуле
-			PoolProjectile.Add(GetWorld()->SpawnActor<AProjectile>(PrjectileClass,     // не знаю, как правильнее создавать
-				local, ProjectileSpawnPoint->GetComponentRotation()));
-			PoolProjectile[i]->setLocal(local);
-		}
-	}
+
 	if (!IsReadyToFire()) {
 		return;
 	}
@@ -51,6 +45,7 @@ void ACannon::Fire()
 			
 			Projectile->SetActorLocation(ProjectileSpawnPoint->GetComponentLocation());
 			Projectile->SetActorRotation(ProjectileSpawnPoint->GetComponentRotation());
+			Projectile->SetActorEnableCollision(true);
 			Projectile->Start();
 		}
 		TimeRate();
@@ -72,7 +67,20 @@ void ACannon::Fire()
 			AActor* OverlappedActor = hitResult.GetActor();
 			if (OverlappedActor) {
 				UE_LOG(LogTemp, Warning, TEXT("Actor: %s"), *OverlappedActor->GetName());
-				OverlappedActor->Destroy();
+				//OverlappedActor->Destroy();
+				IDamageTaker* damageActor = Cast<IDamageTaker>(OverlappedActor);
+				if (damageActor) {
+					FDamageData damageData;
+					damageData.DamageValue = Damage;
+					damageData.Instigator = this;
+					damageData.DamageMaker = this;
+
+					damageActor->TakeDamage(damageData);
+				}
+				else {
+					UE_LOG(LogTemp, Warning, TEXT("Overlapped actor: %s"), *OverlappedActor->GetName());
+					OverlappedActor->Destroy();
+				}
 			}
 		}
 		else {
@@ -90,7 +98,7 @@ void ACannon::Fire()
 }
 
 // альтернативный вариант стрельбы
-void ACannon::FireSpecial()
+void ACannon::FireSpecial()  // an alternative shooting option is shooting without delay
 {
 	if (!IsReadyToFire()) {
 		return;
@@ -153,15 +161,9 @@ void ACannon::AddAmmo(int sum)
 	SumCountAmmunition += sum;
 }
 
-void ACannon::DestroyProjectile()
-{
-	for (auto i : PoolProjectile) {
-		if (i) {
-			i->Destroy();
-			i = nullptr;
-		}
-	}
-}
+
+
+
 
 AProjectile* ACannon::FindProjectile()
 {
@@ -179,7 +181,44 @@ void ACannon::BeginPlay()
 	Super::BeginPlay();
 
 	bReadyToFire = true;
-	
+	if (Cannontype == ECannonType::FireProjectile) {
+		PoolInitial();
+	}
+}
+
+void ACannon::Destroyed()
+{
+	for (auto i : PoolProjectile) {
+		if (i) {
+			i->Destroy();
+			i = nullptr;
+		}
+	}
+}
+
+void ACannon::PoolInitial()
+{
+	PoolProjectile.Reserve(CountAmmunition);
+	for (int i = 0; i < CountAmmunition; ++i) {
+		FVector local = FVector(0.0f, 0.0f, -100.0f);		// снаряды спратаны, пока в пуле
+		FActorSpawnParameters param;
+		param.Owner = this;
+		
+		AProjectile* tempProjectile = GetWorld()->SpawnActor<AProjectile>(PrjectileClass,
+			param);
+		if (tempProjectile) {
+			tempProjectile->setLocal(local);
+			tempProjectile->SetActorEnableCollision(false);
+			ATankPawn* Tank = Cast<ATankPawn>(GetOwner());
+			if (Tank) {
+				tempProjectile->OnDieScore.AddUObject(Tank, &ATankPawn::AddScore);
+			}
+			PoolProjectile.Add(tempProjectile);
+		}
+		//PoolProjectile.Add(GetWorld()->SpawnActor<AProjectile>(PrjectileClass, 
+		//	local, ProjectileSpawnPoint->GetComponentRotation()));
+		//PoolProjectile[i]->setLocal(local);
+	}
 }
 
 // Called every frame
