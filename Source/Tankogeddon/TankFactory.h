@@ -2,25 +2,70 @@
 
 #pragma once
 
+#include "DamageTaker.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "TankFactory.generated.h"
 
+class UStaticMeshComponent;
+class UArrowComponent;
+class UBoxComponent;
+class UHealthComponent;
+class ATankPawn;
+class ATargetPoint;
+class AMapLoader;
+
 UCLASS()
-class TANKOGEDDON_API ATankFactory : public AActor
+class TANKOGEDDON_API ATankFactory : public AActor, public IDamageTaker
 {
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
+
 	ATankFactory();
 
+	virtual void TakeDamage(FDamageData DamageData) override;
+
 protected:
-	// Called when the game starts or when spawned
+
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+		UStaticMeshComponent* BuildingMesh;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+		UStaticMeshComponent* DestroyMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+		UArrowComponent* TankSpawnPoint;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+		UBoxComponent* BoxCollision;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+		UHealthComponent* HealthComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn params")
+		TSubclassOf<ATankPawn> TankSpawnClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn params")
+		float SpawnTankRate = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn params")
+		TArray<ATargetPoint*> TankWayPoints;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapLoader")
+		AMapLoader* MapLoader;
+
+	UFUNCTION()
+	void DamageTaked(float DamageValue);
+
+	UFUNCTION()
+	void Die();
+
+	void SpawnNewTank();
+
+	FTimerHandle spawnTimer;
+
+	//virtual void Tick(float DeltaTime) override;
 };

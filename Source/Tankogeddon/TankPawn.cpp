@@ -11,6 +11,7 @@
 #include <Camera/CameraComponent.h>
 #include <Kismet/KismetMathLibrary.h>
 #include <Components/ArrowComponent.h>
+#include <Engine/TargetPoint.h>
 
 
 ATankPawn::ATankPawn()
@@ -33,6 +34,20 @@ ATankPawn::ATankPawn()
 
 	CannonSetupPoint = CreateDefaultSubobject<UArrowComponent>(TEXT("CannonSetupPoint"));
 	CannonSetupPoint->SetupAttachment(TurretMesh);
+}
+
+TArray<FVector> ATankPawn::GetPatrollingPath() const
+{
+	TArray<FVector> points;
+	for (ATargetPoint* point : PatrollingPath) {
+		points.Add(point->GetActorLocation());
+	}
+	return points;
+}
+
+void ATankPawn::SetPatrollingPath(TArray<ATargetPoint*> newPatrollingPath)
+{
+	PatrollingPath = newPatrollingPath;
 }
 
 FVector ATankPawn::GetTurretForwardVector() const
