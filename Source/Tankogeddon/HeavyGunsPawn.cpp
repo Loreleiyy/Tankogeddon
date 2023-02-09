@@ -50,6 +50,7 @@ void AHeavyGunsPawn::BeginPlay()
 {
 	Super::BeginPlay();
 	SetupCannon(CannonClass);
+
 }
 
 void AHeavyGunsPawn::SetupCannon(TSubclassOf<ACannon> newCannonClass)
@@ -71,7 +72,30 @@ void AHeavyGunsPawn::SetupCannon(TSubclassOf<ACannon> newCannonClass)
 
 void AHeavyGunsPawn::Fire()
 {
+	
 	if (Cannon) {
+		
 		Cannon->Fire();
+	}
+	
+}
+
+void AHeavyGunsPawn::SwapCannon()
+{
+	TSubclassOf<ACannon> TempClass = CannonClass;
+	SetupCannon(CannonClassAdditional);
+	
+	CannonClassAdditional = TempClass;
+}
+
+// Called from Turret or TankAIController
+// if the player is nearby, the cannon changes every 5 seconds
+void AHeavyGunsPawn::SpawnCannonTime()
+{
+	
+	APawn* PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawn();
+	if (PlayerPawn != this) {
+		
+		SwapCannon();
 	}
 }

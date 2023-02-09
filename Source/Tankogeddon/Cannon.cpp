@@ -9,6 +9,9 @@
 #include <Engine/Engine.h>
 #include <TimerManager.h>
 #include <DrawDebugHelpers.h>
+#include <Particles/ParticleSystemComponent.h>
+#include <Components/AudioComponent.h>
+#include <Camera/CameraShakeBase.h>
 
 // Sets default values
 ACannon::ACannon()
@@ -21,12 +24,18 @@ ACannon::ACannon()
 
 	CannonMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CannonMesh"));
 	CannonMesh->SetupAttachment(SceneComp);
+	CannonMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	ProjectileSpawnPoint = CreateDefaultSubobject<UArrowComponent>(TEXT("ArrowComponent"));
 	ProjectileSpawnPoint->SetupAttachment(CannonMesh);
 
-	
-	
+	ShotEffect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ShotEffect"));
+	ShotEffect->SetupAttachment(ProjectileSpawnPoint);
+	ShotEffect->SetAutoActivate(false);
+
+	AudioEffect = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	AudioEffect->SetupAttachment(ProjectileSpawnPoint);
+	AudioEffect->SetAutoActivate(false);
 }
 
 void ACannon::Fire()
@@ -37,55 +46,11 @@ void ACannon::Fire()
 	}
 
 	if (Cannontype == ECannonType::FireProjectile) {
-		GEngine->AddOnScreenDebugMessage(-1, FireRate, FColor::Purple, 
-			FString::Printf(TEXT("Fire Projectile %d sum - %d"), --CountAmmunition, SumCountAmmunition));
-		AProjectile* Projectile = FindProjectile();
-
-		if (Projectile) {
-			
-			Projectile->SetActorLocation(ProjectileSpawnPoint->GetComponentLocation());
-			Projectile->SetActorRotation(ProjectileSpawnPoint->GetComponentRotation());
-			Projectile->SetActorEnableCollision(true);
-			Projectile->Start();
-		}
+		FireProjectile();
 		TimeRate();
 	}
 	else if(Cannontype == ECannonType::FireTrace){
-		GEngine->AddOnScreenDebugMessage(-1, FireRate, FColor::Red, 
-			FString::Printf(TEXT("Fire trace %d sum - %d"), --CountAmmunition, SumCountAmmunition));
-
-		FHitResult hitResult;
-		FCollisionQueryParams traceParams = FCollisionQueryParams();
-		traceParams.AddIgnoredActor(this);
-		traceParams.bReturnPhysicalMaterial = false;
-
-		FVector Start = ProjectileSpawnPoint->GetComponentLocation();
-		FVector End = Start + ProjectileSpawnPoint->GetForwardVector() * FireRange;
-
-		if (GetWorld()->LineTraceSingleByChannel(hitResult, Start, End, ECollisionChannel::ECC_Visibility)) {
-			DrawDebugLine(GetWorld(), Start, hitResult.Location, FColor::Red, false, 1.0f, 0, 5);
-			AActor* OverlappedActor = hitResult.GetActor();
-			if (OverlappedActor) {
-				UE_LOG(LogTemp, Warning, TEXT("Actor: %s"), *OverlappedActor->GetName());
-				//OverlappedActor->Destroy();
-				IDamageTaker* damageActor = Cast<IDamageTaker>(OverlappedActor);
-				if (damageActor) {
-					FDamageData damageData;
-					damageData.DamageValue = Damage;
-					damageData.Instigator = this;
-					damageData.DamageMaker = this;
-
-					damageActor->TakeDamage(damageData);
-				}
-				else {
-					UE_LOG(LogTemp, Warning, TEXT("Overlapped actor: %s"), *OverlappedActor->GetName());
-					OverlappedActor->Destroy();
-				}
-			}
-		}
-		else {
-			DrawDebugLine(GetWorld(), Start, End, FColor::Yellow, false, 1.0f, 0, 5);
-		}
+		FireTrace();
 
 		TimeRate();
 	}
@@ -95,9 +60,20 @@ void ACannon::Fire()
 		GetWorld()->GetTimerManager().SetTimer(SeriesAmmoTimer, this, &ACannon::FireSeries, FireRate / 4, true);
 	}
 
+	if (ShotEffect) {
+		ShotEffect->ActivateSystem();
+	}
+
+	if (AudioEffect) {
+		AudioEffect->Play();
+	}
+
+	if (CameraShake) {
+		GetWorld()->GetFirstPlayerController()->ClientPlayCameraShake(CameraShake);
+	}
 }
 
-// альтернативный вариант стрельбы
+
 void ACannon::FireSpecial()  // an alternative shooting option is shooting without delay
 {
 	if (!IsReadyToFire()) {
@@ -150,7 +126,7 @@ void ACannon::Recharge()  // перезарядка  R
 	}
 }
 
-void ACannon::TimeRate()  // ожидание между выстрелами
+void ACannon::TimeRate()  // waiting between shots
 {
 	bReadyToFire = false;
 	GetWorld()->GetTimerManager().SetTimer(ReloadTimer, this, &ACannon::Reload, FireRate, false);
@@ -200,24 +176,78 @@ void ACannon::PoolInitial()
 {
 	PoolProjectile.Reserve(CountAmmunition);
 	for (int i = 0; i < CountAmmunition; ++i) {
-		FVector local = FVector(0.0f, 0.0f, -100.0f);		// снаряды спратаны, пока в пуле
+		FVector local = FVector(0.0f, 0.0f, -100.0f);		// the shells are hidden while in the bullet
 		FActorSpawnParameters param;
 		param.Owner = this;
 		
 		AProjectile* tempProjectile = GetWorld()->SpawnActor<AProjectile>(PrjectileClass,
 			param);
 		if (tempProjectile) {
-			tempProjectile->setLocal(local);
 			tempProjectile->SetActorEnableCollision(false);
+			tempProjectile->setLocal(local);
+			
 			ATankPawn* Tank = Cast<ATankPawn>(GetOwner());
 			if (Tank) {
 				tempProjectile->OnDieScore.AddUObject(Tank, &ATankPawn::AddScore);
 			}
 			PoolProjectile.Add(tempProjectile);
 		}
-		//PoolProjectile.Add(GetWorld()->SpawnActor<AProjectile>(PrjectileClass, 
-		//	local, ProjectileSpawnPoint->GetComponentRotation()));
-		//PoolProjectile[i]->setLocal(local);
+
+	}
+}
+
+void ACannon::FireProjectile()
+{
+	GEngine->AddOnScreenDebugMessage(-1, FireRate, FColor::Purple,
+		FString::Printf(TEXT("Fire Projectile %d sum - %d"), --CountAmmunition, SumCountAmmunition));
+	AProjectile* Projectile = FindProjectile();
+
+	if (Projectile) {
+
+		Projectile->SetActorLocation(ProjectileSpawnPoint->GetComponentLocation());
+		Projectile->SetActorRotation(ProjectileSpawnPoint->GetComponentRotation());
+		Projectile->SetActorEnableCollision(true);
+		Projectile->Start();
+	}
+	
+}
+
+void ACannon::FireTrace()
+{
+	GEngine->AddOnScreenDebugMessage(-1, FireRate, FColor::Red,
+		FString::Printf(TEXT("Fire trace %d sum - %d"), --CountAmmunition, SumCountAmmunition));
+
+	FHitResult hitResult;
+	FCollisionQueryParams traceParams = FCollisionQueryParams();
+	traceParams.AddIgnoredActor(this);
+	traceParams.bReturnPhysicalMaterial = false;
+
+	FVector Start = ProjectileSpawnPoint->GetComponentLocation();
+	FVector End = Start + ProjectileSpawnPoint->GetForwardVector() * FireRange;
+
+	if (GetWorld()->LineTraceSingleByChannel(hitResult, Start, End, ECollisionChannel::ECC_Visibility)) {
+		DrawDebugLine(GetWorld(), Start, hitResult.Location, FColor::Red, false, 1.0f, 0, 5);
+		AActor* OverlappedActor = hitResult.GetActor();
+		if (OverlappedActor) {
+			UE_LOG(LogTemp, Warning, TEXT("Actor: %s"), *OverlappedActor->GetName());
+
+			IDamageTaker* damageActor = Cast<IDamageTaker>(OverlappedActor);
+			if (damageActor) {
+				FDamageData damageData;
+				damageData.DamageValue = Damage;
+				damageData.Instigator = this;
+				damageData.DamageMaker = this;
+
+				damageActor->TakeDamage(damageData);
+			}
+			else {
+				UE_LOG(LogTemp, Warning, TEXT("Overlapped actor: %s"), *OverlappedActor->GetName());
+				OverlappedActor->Destroy();
+			}
+		}
+	}
+	else {
+		DrawDebugLine(GetWorld(), Start, End, FColor::Yellow, false, 1.0f, 0, 5);
 	}
 }
 
